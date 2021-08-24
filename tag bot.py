@@ -22,4 +22,4 @@ async def wyr(ctx):
     question = ""
     await ctx.send()
 
-client.run('NTU5Mjk2NTA1ODI4MzQzODEw.XJdDdg.kMlV-VcsXBVbkyheNK8n8bj4pjM')
+client.run('NTU5Mjk2NTA1ODI4MzQzODEw.XJdDdg.29UIuvNKQ6AKk1HHngvlvBkyb84')
