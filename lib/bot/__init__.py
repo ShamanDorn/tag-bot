@@ -1,3 +1,4 @@
+from asyncio import sleep
 from glob import glob
 
 from discord import Intents
@@ -11,11 +12,22 @@ from ..db import db
 PREFIX = "+"
 OWNER_IDS = [170825321380184064]
 COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
+class Ready(object):
+    def __init__(self):
+        for cog in COGS:
+            setattr(self, cog, False)
 
+    def ready_up(self, cog):
+        setattr(self, cog, True)
+        print(f" {cog} cog ready")
+
+    def all_ready(self):
+        return all([getattr(self,cog) for cog in COGS])
 class Bot(BotBase):
     def __init__(self):
         self.PREFIX = PREFIX
         self.ready = False
+        self.cogs_ready = Ready()
         self.guild = None
         self.scheduler = AsyncIOScheduler()
 
@@ -29,9 +41,8 @@ class Bot(BotBase):
     def setup(self):
         for cog in COGS:
             self.load_extension(f"lib.cogs.{cog}")
-            print(f"{cog} cog loaded")
 
-        print("setup complete")
+        print(" setup complete")
 
     def run(self, version):
         self.VERSION = version
@@ -46,10 +57,10 @@ class Bot(BotBase):
         super().run(self.TOKEN, reconnect=True)
 
     async def on_connect(self):
-        print("bot connected")
+        print(" bot connected")
 
     async def on_disconnect(self):
-        print("bot disconnected")
+        print(" bot disconnected")
 
     async def on_error(self, err, *args, **kwargs):
         if err == "on_command_error":
@@ -67,11 +78,15 @@ class Bot(BotBase):
 
     async def on_ready(self):
         if not self.ready:
-            self.ready = True
             self.stdout = self.get_channel(862636782704394241)
             self.scheduler.start()
+
+            while not self.cogs_ready.all_ready():
+                await sleep(0.5)
+
+            await self.stdout.send("onlineeee")
+            self.ready = True
             print("bot ready")
-            await self.stdout.send("online again")
 
         else:
             print("bot reconnected")
