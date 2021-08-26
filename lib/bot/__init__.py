@@ -9,7 +9,7 @@ from discord.ext.commands import CommandNotFound
 
 from ..db import db
 
-PREFIX = "+"
+PREFIX = "~"
 OWNER_IDS = [170825321380184064]
 COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
 class Ready(object):
@@ -92,6 +92,7 @@ class Bot(BotBase):
             print("bot reconnected")
 
     async def on_message(self, message):
-        pass
+        if not message.author.bot:
+            await self.process_commands(message)
 
 bot = Bot()
